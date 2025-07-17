@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Talk</title>
+  <style>
+    body { margin: 0; }
+    #grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); height: 100vh; }
+    video { width: 100%; height: 100%; object-fit: cover; }
+  </style>
+</head>
+<body>
+  <div id="grid"></div>
+  <script type="module">
+    import * as Livekit from './node_modules/livekit-client/dist/livekit-client.esm.js';
+
+    async function main() {
+      const res = await fetch('/token');
+      const { token } = await res.json();
+
+      const room = new Livekit.Room();
+
+      room.on('participantConnected', addParticipant);
+      room.on('localTrackPublished', (trackPub) => addTrack(trackPub.track));
+
+      const protocol = location.protocol === 'https:' ? 'wss://' : 'ws://';
+      const url = protocol + location.host + '/ws';
+      await room.connect(url, token);
+
+      room.participants.forEach(addParticipant);
+      addParticipant(room.localParticipant);
+
+      await room.localParticipant.enableCameraAndMicrophone();
+    }
+
+    function addParticipant(participant) {
+      participant.on('trackSubscribed', addTrack);
+      participant.tracks.forEach((pub) => {
+        if (pub.isSubscribed) addTrack(pub.track);
+      });
+    }
+
+    function addTrack(track) {
+      if (track.kind === 'video') {
+        const video = document.createElement('video');
+        video.srcObject = new MediaStream([track]);
+        video.autoplay = true;
+        document.getElementById('grid').appendChild(video);
+      } else if (track.kind === 'audio') {
+        const audio = document.createElement('audio');
+        audio.srcObject = new MediaStream([track]);
+        audio.autoplay = true;
+        document.body.appendChild(audio);
+      }
+    }
+
+    main();
+  </script>
+</body>
+</html> 
