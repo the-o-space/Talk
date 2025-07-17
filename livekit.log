@@ -1,0 +1,3 @@
+2025-07-17T15:06:21.167Z	INFO	livekit	hwstats/memory_linux.go:67	failed reading cgroup specific memory stats, falling back to system wide implementation
+2025-07-17T15:06:21.167Z	INFO	livekit	routing/interfaces.go:175	using single-node routing
+2025-07-17T15:06:21.222Z	INFO	livekit	service/server.go:265	starting LiveKit server	{"portHttp": 7880, "nodeID": "ND_Zz72ADY7ZZHE", "nodeIP": "46.62.155.122", "version": "1.9.0", "rtc.portTCP": 7881, "rtc.portICERange": [50000, 60000]}
